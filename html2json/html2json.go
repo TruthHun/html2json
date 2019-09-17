@@ -70,7 +70,7 @@ func ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
 	}
 	req.Header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36")
 	ex := 10 * time.Second
-	if len(expire) > 0 {
+	if len(expire) > 0 && expire[0] > 0 {
 		ex = time.Duration(expire[0]) * time.Second
 	}
 	resp, err = req.SetTimeout(ex, ex).Response()
