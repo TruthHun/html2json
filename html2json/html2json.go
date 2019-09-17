@@ -138,7 +138,6 @@ func parse(sel *goquery.Selection) (data []h2j) {
 						h.Name = "div"
 					}
 				}
-
 				h.Attrs = attr
 				h.Children = parse(goquery.NewDocumentFromNode(item).Selection)
 			} else {
