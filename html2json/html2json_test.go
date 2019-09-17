@@ -11,9 +11,18 @@ func toJSON(v interface{}) (js string) {
 	return string(b)
 }
 
-func TestParse(t *testing.T) {
-	ginHTML, _ := ioutil.ReadFile("examples/gin.html")
-	nodes, err := ParseByByte(ginHTML)
+func TestParse_BigHTML(t *testing.T) {
+	b, _ := ioutil.ReadFile("examples/gin.html")
+	nodes, err := ParseByByte(b)
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log(toJSON(nodes))
+}
+
+func TestParse_Media(t *testing.T) {
+	b, _ := ioutil.ReadFile("examples/media.html")
+	nodes, err := ParseByByte(b)
 	if err != nil {
 		t.Error(err)
 	}

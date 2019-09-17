@@ -98,7 +98,14 @@ func parse(sel *goquery.Selection) (data []h2j) {
 		for _, item := range ns {
 			var h h2j
 			if item.Type != html.TextNode {
-				h.Name = item.Data
+				h.Name = strings.ToLower(item.Data)
+
+				// 忽略script
+				if h.Name == "script" {
+					continue
+				}
+
+				// attrs
 				attr := make(map[string]string)
 				for _, a := range item.Attr {
 					attr[a.Key] = a.Val
@@ -109,16 +116,29 @@ func parse(sel *goquery.Selection) (data []h2j) {
 				} else {
 					attr["class"] = "tag-" + h.Name
 				}
-				if h.Name == "pre" {
-					h.Name = "div"
-					// set default <pre> css
-					defualtStyle := "display: block;font-family: monospace;white-space: pre;margin: 1em 0;"
-					if style, ok := attr["style"]; ok {
-						attr["style"] = defualtStyle + style
-					} else {
-						attr["style"] = defualtStyle
+
+				// 小程序不支持的HTML标签，全部转为div标签
+				if _, ok := richTextTags[h.Name]; !ok {
+					switch h.Name {
+					case "pre":
+						h.Name = "div"
+						defaultStyle := "display: block;font-family: monospace;white-space: pre;margin: 1em 0;" // set default <pre> css
+						if style, ok := attr["style"]; ok {
+							attr["style"] = defaultStyle + style
+						} else {
+							attr["style"] = defaultStyle
+						}
+					case "audio", "video", "iframe":
+						h.Name = "a"
+						if src, ok := attr["src"]; ok {
+							attr["href"] = src
+							h.Children = []h2j{{Type: "text", Text: fmt.Sprintf(" [audio]%v ", src)}}
+						}
+					default:
+						h.Name = "div"
 					}
 				}
+
 				h.Attrs = attr
 				h.Children = parse(goquery.NewDocumentFromNode(item).Selection)
 			} else {
@@ -130,16 +150,4 @@ func parse(sel *goquery.Selection) (data []h2j) {
 		return true
 	})
 	return
-}
-
-func videoToNode() {
-
-}
-
-func iframeToNode() {
-
-}
-
-func audioToNode() {
-
 }
