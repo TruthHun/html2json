@@ -15,6 +15,12 @@
 			"revisionTime": "2018-10-12T15:44:24Z"
 		},
 		{
+			"checksumSHA1": "sLBLqoCVzo6y8jjT2UbPEJ1YppU=",
+			"path": "github.com/astaxie/beego/httplib",
+			"revision": "32ee728078c84c28f2642c70745afc8f6830044d",
+			"revisionTime": "2019-07-05T04:26:39Z"
+		},
+		{
 			"checksumSHA1": "8uCaUp4B6qHFQhBQ/bTyYQ4ZIUE=",
 			"path": "github.com/gin-contrib/cors",
 			"revision": "2a8f489b42294786cbf465c1f20588b49117f1fe",
@@ -57,8 +63,22 @@
 			"revisionTime": "2019-09-11T10:10:39Z"
 		},
 		{
+			"checksumSHA1": "NsLphrlxGA/Ao+hIbk8qsZtXhT4=",
+			"path": "github.com/go-playground/locales",
+			"revision": "630ebbb602847eba93e75ae38bbc7bb7abcf1ff3",
+			"revisionTime": "2019-04-30T15:33:29Z"
+		},
+		{
+			"checksumSHA1": "6xgFcEYVu7ZWVUeK7Q3gPLJ8h4s=",
+			"path": "github.com/go-playground/locales/currency",
+			"revision": "630ebbb602847eba93e75ae38bbc7bb7abcf1ff3",
+			"revisionTime": "2019-04-30T15:33:29Z"
+		},
+		{
+			"checksumSHA1": "hplgY2pZFLa3jQpcSs9wTfjkk88=",
 			"path": "github.com/go-playground/universal-translator",
-			"revision": ""
+			"revision": "71201497bace774495daed26a3874fd339e0b538",
+			"revisionTime": "2017-03-27T19:17:03Z"
 		},
 		{
 			"checksumSHA1": "EXls795feZCyMJ4W1W4QWhQKZKE=",

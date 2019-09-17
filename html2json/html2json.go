@@ -1,14 +1,21 @@
 package html2json
 
 import (
+	"bytes"
+	"crypto/tls"
 	"fmt"
+	"github.com/astaxie/beego/httplib"
+	"io/ioutil"
+	"net/http"
 	"strings"
+	"time"
 
 	"golang.org/x/net/html"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
+// html to json struct
 type h2j struct {
 	Name     string            `json:"name,omitempty"` // 对应 HTML 标签
 	Type     string            `json:"type,omitempty"` // element 或者 text
@@ -17,13 +24,8 @@ type h2j struct {
 	Children []h2j             `json:"children,omitempty"`
 }
 
-// replace
-type rp struct {
-	Tag          string
-	DefaultStyle string
-}
-
 // 微信小程序支持的 HTML 标签：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
+// 支持的富文本组件 rich-text 的标签
 var richTextTags = map[string]bool{"a": true, "abbr": true, "address": true, "article": true, "aside": true, "b": true,
 	"bdi": true, "bdo": true, "big": true, "blockquote": true, "br": true, "caption": true, "center": true,
 	"cite": true, "code": true, "col": true, "colgroup": true, "dd": true, "del": true, "div": true, "dl": true, "dt": true, "em": true,
@@ -43,6 +45,44 @@ func Parse(htmlStr string) (data []h2j, err error) {
 		data = parse(selection)
 	})
 	return
+}
+
+func ParseByByte(htmlByte []byte) (data []h2j, err error) {
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(bytes.NewReader(htmlByte))
+	if err != nil {
+		return
+	}
+	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
+		data = parse(selection)
+	})
+	return
+}
+
+func ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
+	var (
+		resp *http.Response
+		b    []byte
+	)
+	req := httplib.Get(urlStr)
+	if strings.HasPrefix(strings.ToLower(urlStr), "https://") {
+		req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+	}
+	req.Header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36")
+	ex := 10 * time.Second
+	if len(expire) > 0 {
+		ex = time.Duration(expire[0]) * time.Second
+	}
+	resp, err = req.SetTimeout(ex, ex).Response()
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	b, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	return ParseByByte(b)
 }
 
 func parse(sel *goquery.Selection) (data []h2j) {

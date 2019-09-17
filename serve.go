@@ -31,6 +31,6 @@ func main() {
 	}
 }
 
-func Html2JSON() {
+func Html2JSON(ctx *gin.Context) {
 
 }
