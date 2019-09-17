@@ -1,0 +1,127 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "rXqzjkfStc6C8d7DDOXrmAv/fH8=",
+			"path": "github.com/PuerkitoBio/goquery",
+			"revision": "3dcf72e6c17f694381a21592651ca1464ded0e10",
+			"revisionTime": "2019-01-09T23:07:04Z"
+		},
+		{
+			"checksumSHA1": "RIh1dcM7jKzdb/ZNYrKn9SaIaCw=",
+			"path": "github.com/andybalholm/cascadia",
+			"revision": "680b6a57bda4f657485ad44bdea42342ead737bc",
+			"revisionTime": "2018-10-12T15:44:24Z"
+		},
+		{
+			"checksumSHA1": "8uCaUp4B6qHFQhBQ/bTyYQ4ZIUE=",
+			"path": "github.com/gin-contrib/cors",
+			"revision": "2a8f489b42294786cbf465c1f20588b49117f1fe",
+			"revisionTime": "2019-09-11T13:20:39Z"
+		},
+		{
+			"checksumSHA1": "qWHgGQlDSf8h2jbmBQHnmk0AYHU=",
+			"path": "github.com/gin-contrib/gzip",
+			"revision": "5602d8b438ea3941304664f096ae552230b401eb",
+			"revisionTime": "2019-08-27T14:40:29Z"
+		},
+		{
+			"checksumSHA1": "mKall8xfKBPL/a5Ji//i968rLsY=",
+			"path": "github.com/gin-contrib/sse",
+			"revision": "43f0f29dbd2b3f0feeebff91fd9cda22db296938",
+			"revisionTime": "2019-09-05T05:13:34Z"
+		},
+		{
+			"checksumSHA1": "pW8UtrQGjnl16ukNbnzdCXOlSeU=",
+			"path": "github.com/gin-gonic/gin",
+			"revision": "b562fed3aa28c6e6d0299406d6b06bcb16a498cc",
+			"revisionTime": "2019-09-11T10:10:39Z"
+		},
+		{
+			"checksumSHA1": "216vrRckG3b+d6fG8DLsXPZxa48=",
+			"path": "github.com/gin-gonic/gin/binding",
+			"revision": "b562fed3aa28c6e6d0299406d6b06bcb16a498cc",
+			"revisionTime": "2019-09-11T10:10:39Z"
+		},
+		{
+			"checksumSHA1": "GAHho8qMLbDfGoD4w7SX7ZRT56U=",
+			"path": "github.com/gin-gonic/gin/internal/json",
+			"revision": "b562fed3aa28c6e6d0299406d6b06bcb16a498cc",
+			"revisionTime": "2019-09-11T10:10:39Z"
+		},
+		{
+			"checksumSHA1": "YU4LOusbVFYnlZlOyKw7PK3zhrE=",
+			"path": "github.com/gin-gonic/gin/render",
+			"revision": "b562fed3aa28c6e6d0299406d6b06bcb16a498cc",
+			"revisionTime": "2019-09-11T10:10:39Z"
+		},
+		{
+			"path": "github.com/go-playground/universal-translator",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "EXls795feZCyMJ4W1W4QWhQKZKE=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "822fe56949f5d56c9e2f02367c657e0e9b4d27d1",
+			"revisionTime": "2019-08-27T17:58:35Z"
+		},
+		{
+			"checksumSHA1": "JXlC3eSy7kLsz93aVdKGKtfBSj0=",
+			"path": "github.com/json-iterator/go",
+			"revision": "27518f6661eba504be5a7a9a9f6d9460d892ade3",
+			"revisionTime": "2019-06-21T16:12:01Z"
+		},
+		{
+			"checksumSHA1": "STo3TnkoYreaIlW7ORH3V6uy3ns=",
+			"path": "github.com/leodido/go-urn",
+			"revision": "a67a23e1c1af3c66528573bb86a87246477277c1",
+			"revisionTime": "2018-12-04T09:21:09Z"
+		},
+		{
+			"checksumSHA1": "syj6POVljYx2Crad5J7M/2qKCtg=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "bf9a1dea1961e1d831824fb135332bfb8c10e8b8",
+			"revisionTime": "2019-08-18T12:36:53Z"
+		},
+		{
+			"checksumSHA1": "R7UwDjqiaLRoaEanrANwPOfbgN4=",
+			"path": "github.com/modern-go/concurrent",
+			"revision": "bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94",
+			"revisionTime": "2018-03-06T01:26:44Z"
+		},
+		{
+			"checksumSHA1": "SnVnj87vJdiHFJUcwdL03T0ZMhI=",
+			"path": "github.com/modern-go/reflect2",
+			"revision": "94122c33edd36123c84d5368cfb2b69df93a0ec8",
+			"revisionTime": "2018-07-18T01:23:57Z"
+		},
+		{
+			"checksumSHA1": "tUybPhSS6kQxGMa6rmzF11EcnkE=",
+			"path": "github.com/ugorji/go/codec",
+			"revision": "42bc974514ff101a54c6b72a0e4dee29d96c0b26",
+			"revisionTime": "2019-08-12T10:43:08Z"
+		},
+		{
+			"path": "golang.org/x/net/html",
+			"revision": ""
+		},
+		{
+			"path": "golang.org/x/sys/unix",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "P7A15IT+qS+z2jL3z4Ttv7utpsI=",
+			"path": "gopkg.in/go-playground/validator.v9",
+			"revision": "556b9da3c05f2a935bc086fb5a0bb55dd8112d2d",
+			"revisionTime": "2019-07-12T15:35:03Z"
+		},
+		{
+			"checksumSHA1": "oNqPrS2edE8peI3ah2INe379k8E=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "51d6538a90f86fe93ac480b35f37b2be17fef232",
+			"revisionTime": "2018-11-15T11:05:04Z"
+		}
+	],
+	"rootPath": "github.com/TruthHun/html2json"
+}
