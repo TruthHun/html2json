@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/html"
@@ -24,42 +25,61 @@ type h2j struct {
 	Children []h2j             `json:"children,omitempty"`
 }
 
-// 微信小程序支持的 HTML 标签：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
-// 支持的富文本组件 rich-text 的标签
-var richTextTags = map[string]bool{"a": true, "abbr": true, "address": true, "article": true, "aside": true, "b": true,
-	"bdi": true, "bdo": true, "big": true, "blockquote": true, "br": true, "caption": true, "center": true,
-	"cite": true, "code": true, "col": true, "colgroup": true, "dd": true, "del": true, "div": true, "dl": true, "dt": true, "em": true,
-	"fieldset": true, "font": true, "footer": true, "h1": true, "h2": true, "h3": true, "h4": true, "h5": true, "h6": true,
-	"header": true, "hr": true, "i": true, "img": true, "ins": true, "label": true, "legend": true, "li": true, "mark": true,
-	"nav": true, "ol": true, "p": true, "q": true, "rt": true, "ruby": true,
-	"s": true, "section": true, "small": true, "span": true, "strong": true, "sub": true, "sup": true,
-	"table": true, "tbody": true, "td": true, "tfoot": true, "th": true, " thead": true, "tr": true, "tt": true, "u": true, "ul": true}
+type RichText struct {
+	tagsMap sync.Map
+}
 
-func Parse(htmlStr string) (data []h2j, err error) {
+// 各小程序支持的HTML标签
+//		微信小程序：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
+//		支付宝小程序：https://docs.alipay.com/mini/component/rich-text
+//		百度小程序：https://smartprogram.baidu.com/docs/develop/component/base/#rich-text-%E5%AF%8C%E6%96%87%E6%9C%AC/
+//		头条小程序：https://developer.toutiao.com/dev/miniapp/uEDMy4SMwIjLxAjM
+//		QQ小程序：https://q.qq.com/wiki/develop/miniprogram/component/basic-content/rich-text.html
+//		uni-app: https://uniapp.dcloud.io/component/rich-text?id=rich-text
+//  我们这里以 uni-app 支持的标签为默认支持的标签
+var defaultTags = []string{
+	"a", "abbr", "b", "blockquote", "br", "code", "col", "colgroup", "dd", "del", "div", "dl", "dt", "em", "fieldset", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "i", "img", "ins", "label", "legend", "li", "ol", "p", "q", "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "tt", "ul",
+}
+
+func NewDefault() *RichText {
+	return New(defaultTags)
+}
+
+func New(customTags []string) *RichText {
+	tagsMap := sync.Map{}
+	for _, tag := range customTags {
+		tagsMap.Store(strings.ToLower(tag), true)
+	}
+	return &RichText{
+		tagsMap: tagsMap,
+	}
+}
+
+func (r *RichText) Parse(htmlStr string) (data []h2j, err error) {
 	var doc *goquery.Document
 	doc, err = goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
 	if err != nil {
 		return
 	}
 	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
-		data = parse(selection)
+		data = r.parse(selection)
 	})
 	return
 }
 
-func ParseByByte(htmlByte []byte) (data []h2j, err error) {
+func (r *RichText) ParseByByte(htmlByte []byte) (data []h2j, err error) {
 	var doc *goquery.Document
 	doc, err = goquery.NewDocumentFromReader(bytes.NewReader(htmlByte))
 	if err != nil {
 		return
 	}
 	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
-		data = parse(selection)
+		data = r.parse(selection)
 	})
 	return
 }
 
-func ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
+func (r *RichText) ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
 	var (
 		resp *http.Response
 		b    []byte
@@ -82,10 +102,10 @@ func ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
 	if err != nil {
 		return
 	}
-	return ParseByByte(b)
+	return r.ParseByByte(b)
 }
 
-func parse(sel *goquery.Selection) (data []h2j) {
+func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
 	nodes := sel.Children().Nodes
 	if len(nodes) == 0 {
 		if txt := sel.Text(); txt != "" {
@@ -118,7 +138,7 @@ func parse(sel *goquery.Selection) (data []h2j) {
 				}
 
 				// 小程序不支持的HTML标签，全部转为div标签
-				if _, ok := richTextTags[h.Name]; !ok {
+				if _, ok := r.tagsMap.Load(h.Name); !ok {
 					switch h.Name {
 					case "pre":
 						h.Name = "div"
@@ -139,7 +159,7 @@ func parse(sel *goquery.Selection) (data []h2j) {
 					}
 				}
 				h.Attrs = attr
-				h.Children = parse(goquery.NewDocumentFromNode(item).Selection)
+				h.Children = r.parse(goquery.NewDocumentFromNode(item).Selection)
 			} else {
 				h.Type = "text"
 				h.Text = goquery.NewDocumentFromNode(item).Selection.Text()

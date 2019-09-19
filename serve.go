@@ -18,8 +18,11 @@ type Response struct {
 	Data  interface{} `json:"data,omitempty"`
 }
 
+var rt = html2json.NewDefault()
+
 func main() {
 	app := gin.New()
+
 	// 设置跨域和gzip
 	app.Use(ginzip.Gzip(gzip.BestCompression), cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -28,9 +31,8 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}), gin.Recovery())
-	app.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"pong": "hello html2json!"})
-	})
+
+	app.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"pong": "hello html2json!"}) })
 	app.GET("/html2json", html2JSON)  // params: url, expire
 	app.POST("/html2json", html2JSON) // params: html
 	err := app.Run(":8888")
@@ -48,7 +50,7 @@ func html2JSON(ctx *gin.Context) {
 		if htmlStr == "" {
 			err = errors.New("html is empty")
 		} else {
-			resp.Data, err = html2json.Parse(htmlStr)
+			resp.Data, err = rt.Parse(htmlStr)
 		}
 	case http.MethodGet:
 		urlStr := ctx.DefaultQuery("url", "")
@@ -56,7 +58,7 @@ func html2JSON(ctx *gin.Context) {
 		if urlStr == "" {
 			err = errors.New("url is empty")
 		} else {
-			resp.Data, err = html2json.ParseByURL(urlStr, exp)
+			resp.Data, err = rt.ParseByURL(urlStr, exp)
 		}
 	default:
 		err = errors.New("request method is not allow")
