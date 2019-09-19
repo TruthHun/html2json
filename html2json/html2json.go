@@ -70,7 +70,7 @@ func (r *RichText) ParseByByte(htmlByte []byte) (data []h2j, err error) {
 	return
 }
 
-func (r *RichText) ParseByURL(urlStr string, expire ...int) (data []h2j, err error) {
+func (r *RichText) ParseByURL(urlStr string, timeout ...int) (data []h2j, err error) {
 	var (
 		resp *http.Response
 		b    []byte
@@ -80,11 +80,11 @@ func (r *RichText) ParseByURL(urlStr string, expire ...int) (data []h2j, err err
 		req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
 	req.Header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36")
-	ex := 10 * time.Second
-	if len(expire) > 0 && expire[0] > 0 {
-		ex = time.Duration(expire[0]) * time.Second
+	to := 10 * time.Second
+	if len(timeout) > 0 && timeout[0] > 0 {
+		to = time.Duration(timeout[0]) * time.Second
 	}
-	resp, err = req.SetTimeout(ex, ex).Response()
+	resp, err = req.SetTimeout(to, to).Response()
 	if err != nil {
 		return
 	}

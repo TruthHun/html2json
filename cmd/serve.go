@@ -104,7 +104,7 @@ func serve(port int, tag ...string) {
 	}), gin.Recovery())
 
 	app.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"pong": "hello html2json!"}) })
-	app.GET("/html2json", html2JSON)  // params: url, expire
+	app.GET("/html2json", html2JSON)  // params: url, timeout
 	app.POST("/html2json", html2JSON) // params: html
 
 	fmt.Println("serve on port:", port)
@@ -127,11 +127,11 @@ func html2JSON(ctx *gin.Context) {
 		}
 	case http.MethodGet:
 		urlStr := ctx.DefaultQuery("url", "")
-		exp, _ := strconv.Atoi(ctx.DefaultQuery("expire", "10"))
+		timeout, _ := strconv.Atoi(ctx.DefaultQuery("timeout", "10"))
 		if urlStr == "" {
 			err = errors.New("url is empty")
 		} else {
-			resp.Data, err = rt.ParseByURL(urlStr, exp)
+			resp.Data, err = rt.ParseByURL(urlStr, timeout)
 		}
 	default:
 		err = errors.New("request method is not allow")

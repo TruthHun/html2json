@@ -2,8 +2,10 @@ package html2json
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 var rt = NewDefault()
@@ -15,10 +17,12 @@ func toJSON(v interface{}) (js string) {
 
 func TestParse_BigHTML(t *testing.T) {
 	b, _ := ioutil.ReadFile("examples/gin.html")
+	now:=time.Now()
 	nodes, err := rt.ParseByByte(b)
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println(time.Since(now))
 	t.Log(toJSON(nodes))
 }
 
