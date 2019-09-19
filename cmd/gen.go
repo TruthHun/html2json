@@ -23,8 +23,15 @@ import (
 // genCmd represents the gen command
 var genCmd = &cobra.Command{
 	Use:   "gen",
-	Short: "生成HTML标签的配置文件，以便修改和进行标签的自定义",
-	Long:  `alipay，baidu，qq，weixin，toutiao，app.`,
+	Short: "gen will generate a list of HTML tags that mini program supported to a json file",
+	Long: `
+html2json gen [app]		generate uni-app tags
+html2json gen alipay	generate alipay tags
+html2json gen weixin	generate weixin tags
+html2json gen baidu		generate baidu tags
+html2json gen qq		generate qq tags
+html2json gen toutiao	generate toutiao tags
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gen called")
 	},

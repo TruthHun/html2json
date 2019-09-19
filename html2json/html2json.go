@@ -46,6 +46,9 @@ func NewDefault() *RichText {
 }
 
 func New(customTags []string) *RichText {
+	if len(customTags) == 0 {
+		customTags = defaultTags
+	}
 	tagsMap := sync.Map{}
 	for _, tag := range customTags {
 		tagsMap.Store(strings.ToLower(tag), true)

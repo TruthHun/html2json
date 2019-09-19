@@ -87,6 +87,12 @@
 			"revisionTime": "2019-08-27T17:58:35Z"
 		},
 		{
+			"checksumSHA1": "UYDU8nJJ/RXSTrR+dgQodj78uQI=",
+			"path": "github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"revisionTime": "2014-10-17T20:07:13Z"
+		},
+		{
 			"checksumSHA1": "JXlC3eSy7kLsz93aVdKGKtfBSj0=",
 			"path": "github.com/json-iterator/go",
 			"revision": "27518f6661eba504be5a7a9a9f6d9460d892ade3",
@@ -115,6 +121,18 @@
 			"path": "github.com/modern-go/reflect2",
 			"revision": "94122c33edd36123c84d5368cfb2b69df93a0ec8",
 			"revisionTime": "2018-07-18T01:23:57Z"
+		},
+		{
+			"checksumSHA1": "uh6QVdBY0YCHyVfAgGidkmaQKA0=",
+			"path": "github.com/spf13/cobra",
+			"revision": "19cf35ea77e5981f8e8b90a897af621f2be864f6",
+			"revisionTime": "2019-09-17T15:02:42Z"
+		},
+		{
+			"checksumSHA1": "SYcZl2+5o5l7EInG3AuRs0PFkL0=",
+			"path": "github.com/spf13/pflag",
+			"revision": "2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab",
+			"revisionTime": "2019-09-18T19:59:20Z"
 		},
 		{
 			"checksumSHA1": "tUybPhSS6kQxGMa6rmzF11EcnkE=",
