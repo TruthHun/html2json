@@ -15,7 +15,11 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/TruthHun/html2json/html2json"
+	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -25,15 +29,25 @@ var genCmd = &cobra.Command{
 	Use:   "gen",
 	Short: "生成小程序 rich-text 组件支持的HTML标签到json文件中",
 	Long: `
-html2json gen app		生成 uni-app 支持的HTML标签
-html2json gen alipay	生成支付宝小程序支持的HTML标签
-html2json gen weixin	生成微信小程序支持的HTML标签
-html2json gen baidu		生成百度小程序支持的HTML标签
-html2json gen qq		生成QQ小程序支持的HTML标签
-html2json gen toutiao	生成头条小程序支持的HTML标签
+html2json gen --cate app		生成 uni-app 支持的HTML标签
+html2json gen --cate alipay	生成支付宝小程序支持的HTML标签
+html2json gen --cate weixin	生成微信小程序支持的HTML标签
+html2json gen --cate baidu		生成百度小程序支持的HTML标签
+html2json gen --cate qq		生成QQ小程序支持的HTML标签
+html2json gen --cate toutiao	生成头条小程序支持的HTML标签
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gen called")
+		cate := cmd.Flag("cate").Value.String()
+		tags := html2json.GetTags(cate)
+		file := fmt.Sprintf("%v.json", cate)
+		b, err := json.Marshal(tags)
+		if err != nil {
+			panic(err)
+		}
+		if err = ioutil.WriteFile(file, b, os.ModePerm); err != nil {
+			panic(err)
+		}
+		fmt.Printf("write to file : %v\n", file)
 	},
 }
 
@@ -44,7 +58,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// genCmd.PersistentFlags().String("foo", "", "A help for foo")
+	genCmd.PersistentFlags().String("cate", "app", "小程序分类")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
