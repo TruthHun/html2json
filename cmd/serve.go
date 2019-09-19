@@ -33,8 +33,8 @@ import (
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "start a service",
-	Long:  `serve will start a service with restful api`,
+	Short: "启动HTTP服务",
+	Long:  `以HTTP接口的形式提供HTML转JSON的服务`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			tags []string
@@ -44,7 +44,7 @@ var serveCmd = &cobra.Command{
 		)
 		if port, err = strconv.Atoi(cmd.Flag("port").Value.String()); err != nil {
 			fmt.Println(err.Error())
-			fmt.Println("use default port: ", 8888)
+			fmt.Println("使用默认端口: ", 8888)
 			port = 8888
 		}
 
@@ -52,11 +52,11 @@ var serveCmd = &cobra.Command{
 		if tagsFile != "" {
 			if b, err = ioutil.ReadFile(tagsFile); err != nil {
 				fmt.Println(err.Error())
-				fmt.Println("use default html tags")
+				fmt.Println("使用默认HTML标签")
 			} else {
 				if err = json.Unmarshal(b, &tags); err != nil {
 					fmt.Println(err.Error())
-					fmt.Println("use default html tags")
+					fmt.Println("使用默认HTML标签")
 				}
 			}
 		}
@@ -71,8 +71,8 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	serveCmd.PersistentFlags().Int("port", 8888, "service port to listen")
-	serveCmd.PersistentFlags().String("tags", "", "trusted HTML tags json array file, such as tags.json")
+	serveCmd.PersistentFlags().Int("port", 8888, "服务监听端口")
+	serveCmd.PersistentFlags().String("tags", "", "自定义的可信任的HTML标签所在的json文件路径")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

@@ -23,14 +23,14 @@ import (
 // genCmd represents the gen command
 var genCmd = &cobra.Command{
 	Use:   "gen",
-	Short: "gen will generate a list of HTML tags that mini program supported to a json file",
+	Short: "生成小程序 rich-text 组件支持的HTML标签到json文件中",
 	Long: `
-html2json gen [app]		generate uni-app tags
-html2json gen alipay	generate alipay tags
-html2json gen weixin	generate weixin tags
-html2json gen baidu		generate baidu tags
-html2json gen qq		generate qq tags
-html2json gen toutiao	generate toutiao tags
+html2json gen app		生成 uni-app 支持的HTML标签
+html2json gen alipay	生成支付宝小程序支持的HTML标签
+html2json gen weixin	生成微信小程序支持的HTML标签
+html2json gen baidu		生成百度小程序支持的HTML标签
+html2json gen qq		生成QQ小程序支持的HTML标签
+html2json gen toutiao	生成头条小程序支持的HTML标签
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gen called")
