@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -48,39 +50,39 @@ func New(customTags []string) *RichText {
 	}
 }
 
-func (r *RichText) ParseMarkdown(md string) (data []h2j, err error) {
-	return r.ParseMarkdownByByte([]byte(md))
+func (r *RichText) ParseMarkdown(md, domain string) (data []h2j, err error) {
+	return r.ParseMarkdownByByte([]byte(md), domain)
 }
 
-func (r *RichText) ParseMarkdownByByte(mdByte []byte) (data []h2j, err error) {
-	return r.ParseByByte(blackfriday.MarkdownCommon(mdByte))
+func (r *RichText) ParseMarkdownByByte(mdByte []byte, domain string) (data []h2j, err error) {
+	return r.ParseByByte(blackfriday.MarkdownCommon(mdByte), domain)
 }
 
-func (r *RichText) Parse(htmlStr string) (data []h2j, err error) {
+func (r *RichText) Parse(htmlStr string, domain string) (data []h2j, err error) {
 	var doc *goquery.Document
 	doc, err = goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
 	if err != nil {
 		return
 	}
 	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
-		data = r.parse(selection)
+		data = r.parse(selection, domain)
 	})
 	return
 }
 
-func (r *RichText) ParseByByte(htmlByte []byte) (data []h2j, err error) {
+func (r *RichText) ParseByByte(htmlByte []byte, domain string) (data []h2j, err error) {
 	var doc *goquery.Document
 	doc, err = goquery.NewDocumentFromReader(bytes.NewReader(htmlByte))
 	if err != nil {
 		return
 	}
 	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
-		data = r.parse(selection)
+		data = r.parse(selection, domain)
 	})
 	return
 }
 
-func (r *RichText) ParseByURL(urlStr string, timeout ...int) (data []h2j, err error) {
+func (r *RichText) ParseByURL(urlStr string, domain string, timeout ...int) (data []h2j, err error) {
 	var (
 		resp *http.Response
 		b    []byte
@@ -103,10 +105,10 @@ func (r *RichText) ParseByURL(urlStr string, timeout ...int) (data []h2j, err er
 	if err != nil {
 		return
 	}
-	return r.ParseByByte(b)
+	return r.ParseByByte(b, domain)
 }
 
-func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
+func (r *RichText) parse(sel *goquery.Selection, domain string) (data []h2j) {
 	nodes := sel.Children().Nodes
 	if len(nodes) == 0 {
 		if txt := sel.Text(); txt != "" {
@@ -122,7 +124,7 @@ func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
 				h.Name = strings.ToLower(item.Data)
 
 				// 忽略script
-				if h.Name == "script" {
+				if h.Name == "script" || h.Name == "link" {
 					continue
 				}
 
@@ -138,6 +140,17 @@ func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
 					attr["class"] = "tag-" + h.Name
 				}
 
+				switch h.Name {
+				case "img", "audio", "video":
+					if src, ok := attr["src"]; ok {
+						attr["src"] = r.fixSourceLink(domain, src)
+					}
+				case "a":
+					if href, ok := attr["href"]; ok {
+						attr["href"] = r.fixSourceLink(domain, href)
+					}
+				}
+
 				// 小程序不支持的HTML标签，全部转为div标签
 				if _, ok := r.tagsMap.Load(h.Name); !ok {
 					switch h.Name {
@@ -150,17 +163,21 @@ func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
 							attr["style"] = defaultStyle
 						}
 					case "audio", "video", "iframe":
-						h.Name = "a"
 						if src, ok := attr["src"]; ok {
+							src = r.fixSourceLink(domain, src)
 							attr["href"] = src
-							h.Children = []h2j{{Type: "text", Text: fmt.Sprintf(" [audio]%v ", src)}}
+							delete(attr, "src")
+							h.Children = []h2j{{Type: "text", Text: fmt.Sprintf(" [%v] %v ", h.Name, src)}}
 						}
+						h.Name = "a"
 					default:
 						h.Name = "div"
 					}
 				}
 				h.Attrs = attr
-				h.Children = r.parse(goquery.NewDocumentFromNode(item).Selection)
+				if len(h.Children) == 0 {
+					h.Children = r.parse(goquery.NewDocumentFromNode(item).Selection, domain)
+				}
 			} else {
 				h.Type = "text"
 				h.Text = goquery.NewDocumentFromNode(item).Selection.Text()
@@ -170,4 +187,33 @@ func (r *RichText) parse(sel *goquery.Selection) (data []h2j) {
 		return true
 	})
 	return
+}
+
+func (r *RichText) fixSourceLink(domain, link string) string {
+	if domain == "" {
+		return link
+	}
+
+	if strings.HasPrefix(link, "//") {
+		return "http:" + link
+	}
+
+	linkLower := strings.ToLower(link)
+	if strings.HasPrefix(linkLower, "https://") || strings.HasPrefix(linkLower, "http://") {
+		return link
+	}
+
+	u, err := url.Parse(domain)
+
+	if err != nil {
+		return link
+	}
+
+	if strings.HasPrefix(link, "/") {
+		return u.Scheme + "://" + u.Host + "/" + strings.TrimLeft(link, "/")
+	}
+	u.Path = path.Join(strings.TrimRight(u.Path, "/")+"/", link)
+
+	// return u.String() // 会对中文进行编码
+	return u.Scheme + "://" + u.Host + "/" + strings.Trim(u.Path, "/")
 }

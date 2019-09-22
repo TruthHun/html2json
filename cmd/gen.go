@@ -17,9 +17,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/TruthHun/html2json/html2json"
 	"io/ioutil"
 	"os"
+
+	"github.com/TruthHun/html2json/html2json"
 
 	"github.com/spf13/cobra"
 )
@@ -38,7 +39,7 @@ html2json gen --cate toutiao	生成头条小程序支持的HTML标签
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		cate := cmd.Flag("cate").Value.String()
-		tags := html2json.GetTags(cate)
+		tags := html2json.GetTags(html2json.Tag(cate))
 		file := fmt.Sprintf("%v.json", cate)
 		b, err := json.Marshal(tags)
 		if err != nil {

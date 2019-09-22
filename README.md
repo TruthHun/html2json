@@ -40,8 +40,8 @@
 ./html2json serve --port 8888 --tags weixin-html-tags.json
 ```
 
-- `--port` - 指定服务端口，默认为 8888
-- `--tags` - 指定信任的HTML元素。json数组文件，里面存放各个支持的HTML标签。默认使用 uni-app 信任的HTML标签
+- `--port` - [非必需参数]指定服务端口，默认为 8888
+- `--tags` - [非必须参数]指定信任的HTML元素。json数组文件，里面存放各个支持的HTML标签。默认使用 uni-app 信任的HTML标签
 
 各小程序支持的HTML标签
 
@@ -51,6 +51,10 @@
 > - 头条小程序：https://developer.toutiao.com/dev/miniapp/uEDMy4SMwIjLxAjM
 > - QQ小程序：https://q.qq.com/wiki/develop/miniprogram/component/basic-content/rich-text.html
 > - uni-app: https://uniapp.dcloud.io/component/rich-text?id=rich-text
+
+`weixin-html-tags.json`文件示例：
+```
+```
 
 #### API接口
 
@@ -137,26 +141,23 @@ func main()  {
 	//rt:=html2json.NewDefault()
 	appTags:=html2json.GetTags(html2json.TagUniAPP)
 	rt:=html2json.New(appTags)
-	//rt.ParseMarkdown() // parse markdown to json
-	//rt.ParseMarkdownByByte() // parse markdown to json by byte
-	//rt.ParseByByte() // parse html to json by byte
-
 	htmlStr:=`
-<div>hello world!</div>
+<div>
+	hello world!
+	<span>this is a span</span>
+	a b c d e
+	<img src="https://www.bookstack.cn/static/images/logo.png"/>
+	<audio src="helloworld.mp3"></audio>
+	<video src="../bookstack.mp4"></video>
+<a href="https://www.bookstack.cn">书栈网 - 分享知识，共享智慧</a>
+</div>
+<iframe src="https://www.baidu.com" frameborder="0"></iframe>
 <pre>
 	this is pre code
 </pre>
 `
 	now:=time.Now()
-	nodes,err:=rt.Parse(htmlStr)
-	if err!=nil{
-		panic(err)
-	}
-	fmt.Println("spend time",time.Since(now))
-	fmt.Println(toJSON(nodes))
-
-	now=time.Now()
-	nodes, err=rt.ParseByURL("https://www.oschina.net",10)
+	nodes,err:=rt.Parse(htmlStr,"https://www.bookstack.cn/static/")
 	if err!=nil{
 		panic(err)
 	}
@@ -170,8 +171,7 @@ func toJSON(v interface{}) (js string) {
 }
 ```
 
-**示例代码部分输出结果**
-
+**示例代码输出结果**
 ```
 [{
 	"name": "div",
@@ -180,7 +180,81 @@ func toJSON(v interface{}) (js string) {
 	},
 	"children": [{
 		"type": "text",
-		"text": "hello world!"
+		"text": "\n\thello world!\n\t"
+	}, {
+		"name": "span",
+		"attrs": {
+			"class": "tag-span"
+		},
+		"children": [{
+			"type": "text",
+			"text": "this is a span"
+		}]
+	}, {
+		"type": "text",
+		"text": "\n\ta b c d e\n\t"
+	}, {
+		"name": "img",
+		"attrs": {
+			"class": "tag-img",
+			"src": "https://www.bookstack.cn/static/images/logo.png"
+		}
+	}, {
+		"type": "text",
+		"text": "\n\t"
+	}, {
+		"name": "a",
+		"attrs": {
+			"class": "tag-audio",
+			"href": "https://www.bookstack.cn/static/helloworld.mp3",
+		},
+		"children": [{
+			"type": "text",
+			"text": " [audio] https://www.bookstack.cn/static/helloworld.mp3 "
+		}]
+	}, {
+		"type": "text",
+		"text": "\n\t"
+	}, {
+		"name": "a",
+		"attrs": {
+			"class": "tag-video",
+			"href": "https://www.bookstack.cn/bookstack.mp4",
+		},
+		"children": [{
+			"type": "text",
+			"text": " [video] https://www.bookstack.cn/bookstack.mp4 "
+		}]
+	}, {
+		"type": "text",
+		"text": "\n"
+	}, {
+		"name": "a",
+		"attrs": {
+			"class": "tag-a",
+			"href": "https://www.bookstack.cn"
+		},
+		"children": [{
+			"type": "text",
+			"text": "书栈网 - 分享知识，共享智慧"
+		}]
+	}, {
+		"type": "text",
+		"text": "\n"
+	}]
+}, {
+	"type": "text",
+	"text": "\n"
+}, {
+	"name": "a",
+	"attrs": {
+		"class": "tag-iframe",
+		"frameborder": "0",
+		"href": "https://www.baidu.com",
+	},
+	"children": [{
+		"type": "text",
+		"text": " [iframe] https://www.baidu.com "
 	}]
 }, {
 	"type": "text",
@@ -219,5 +293,9 @@ white-space: pre;
 margin: 1em 0;
 ```
 
+同时，如果`video`、`iframe`、`audio`标签，如果在信任的标签里面，则作为`a`标签处理
+
 
 ## 程序体验
+
+编译好了的程序，只有一个 exe 文件

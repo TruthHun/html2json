@@ -122,18 +122,23 @@ func html2JSON(ctx *gin.Context) {
 	switch ctx.Request.Method {
 	case http.MethodPost:
 		htmlStr := ctx.DefaultPostForm("html", "")
+		domain := ctx.DefaultPostForm("domain", "")
 		if htmlStr == "" {
 			err = errors.New("html is empty")
 		} else {
-			resp.Nodes, err = rt.Parse(htmlStr)
+			resp.Nodes, err = rt.Parse(htmlStr, domain)
 		}
 	case http.MethodGet:
 		urlStr := ctx.DefaultQuery("url", "")
+		domain := ctx.DefaultQuery("domain", "")
 		timeout, _ := strconv.Atoi(ctx.DefaultQuery("timeout", "10"))
 		if urlStr == "" {
 			err = errors.New("url is empty")
 		} else {
-			resp.Nodes, err = rt.ParseByURL(urlStr, timeout)
+			if domain == "" {
+				domain = urlStr
+			}
+			resp.Nodes, err = rt.ParseByURL(urlStr, domain, timeout)
 		}
 	default:
 		err = errors.New("request method is not allow")
@@ -149,10 +154,11 @@ func md2json(ctx *gin.Context) {
 	var err error
 	resp := Response{IsOK: true}
 	md := ctx.DefaultPostForm("markdown", "")
+	domain := ctx.DefaultPostForm("domain", "")
 	if md == "" {
 		err = errors.New("markdown is empty")
 	} else {
-		resp.Nodes, err = rt.ParseMarkdown(md)
+		resp.Nodes, err = rt.ParseMarkdown(md, domain)
 	}
 	resp.IsOK = err == nil
 	if err != nil {
