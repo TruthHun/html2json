@@ -4,8 +4,9 @@
 
 ## 介绍
 
-在开发`BookStack`的配套微信小程序`BookChat`以及使用 `uni-app` 开发配套的手机APP应用`BookChatApp`的过程中，
-我尝试了很多种开源的小程序HTML解析渲染工具，但都不是很满意，主要体现在以下几点：
+在开发 [BookStack](https://gitee.com/truthhun/BookStack) 的配套微信小程序 [BookChat](https://gitee.com/truthhun/BookChat) 
+以及使用 `uni-app` 开发配套的手机APP应用 [BookChatApp](https://gitee.com/truthhun/BookChatApp)的过程中，
+我尝试了很多种开源的小程序HTML解析渲染组件，但都不是很满意，主要体现在以下几点：
 
 1. 性能不好，影响体验。
     
@@ -20,17 +21,17 @@
     
     表格、代码块渲染效果差强人意
 
-基于以上，所以用Go语言开发实现了这么个转换工具，将HTML和markdown转为JSON。
+基于以上原因，所以决定用Go语言开发实现了这么个转换工具，将HTML和markdown转为JSON。
 
-对我来说，在后端将HTML转为JSON，并配合小程序`rich-text`组件对内容进行渲染，性能、稳定性以及渲染效果都比较符合预期，尽管并没有第三方HTML渲染工具那样提供了图片预览的功能。
+对我来说，在后端将HTML转为JSON，并配合小程序自带的`rich-text`组件对内容进行渲染，性能、稳定性以及渲染效果都比较符合预期，尽管并没有第三方HTML渲染工具那样提供图片预览的功能。
 
 目前已经在`BookStack` v2.1 版本中使用了。
 
 ## 特点
 
+1. 支持markdown和HTML转JSON
 1. 可作为 resetful 服务提供API接口进行访问
 1. Go语言开发者，可作为包的形式进行引用
-1. 支持markdown和HTML转JSON
 
 ## 使用方式
 
