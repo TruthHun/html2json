@@ -1,7 +1,5 @@
 package html2json
 
-import "strings"
-
 // 各小程序支持的HTML标签
 //		微信小程序：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
 //		支付宝小程序：https://docs.alipay.com/mini/component/rich-text
@@ -29,18 +27,31 @@ var (
 	toutiaoTags = defaultTags // 没看到有限定的信任标签
 )
 
-func GetTags(cate string) []string {
-	switch strings.ToLower(cate) {
-	case "baidu":
+type Tag string
+
+const (
+	TagBaidu   = "baidu"
+	TagAplipay = "alipay"
+	TagQQ      = "qq"
+	TagWeixin  = "weixin"
+	TagToutiao = "toutiao"
+	TagUniAPP  = "uni-app"
+)
+
+func GetTags(cate Tag) []string {
+	switch cate {
+	case TagBaidu:
 		return baiduTags
-	case "alipay":
+	case TagAplipay:
 		return alipayTags
-	case "qq":
+	case TagQQ:
 		return qqTags
-	case "mp", "weixin":
+	case "mp", TagWeixin:
 		return mpTags
-	case "tt", "toutiao":
+	case "tt", TagToutiao:
 		return toutiaoTags
+	case TagUniAPP:
+		return defaultTags
 	default:
 		return defaultTags
 	}
