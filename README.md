@@ -10,7 +10,7 @@
 
 1. 性能不好，影响体验。
     
-    书栈网的HTML内容长度大小不一，大一点(100kb左右)的HTML内容渲染，要10多秒，这种对于用户体验来说，是难以忍受的。
+    [书栈网](https://www.bookstack.cn) 的HTML内容长度大小不一，大一点(100kb左右)的HTML内容渲染，要10多秒，这种对于用户体验来说，是难以忍受的。
 
 1. 稳定性不高，容错不够。
     
@@ -34,6 +34,8 @@
 1. Go语言开发者，可作为包的形式进行引用
 
 ## 使用方式
+
+更多使用帮助，使用如下方式查看
 
 ```
 ./html2json --help
@@ -60,6 +62,7 @@
 
 `weixin-html-tags.json`文件示例：
 ```
+["a", "abbr", "address", "article", "aside", "b", "bdi", "bdo", "big", "blockquote", "br", "caption", "center", "cite", "code", "col", "colgroup", "dd", "del", "div", "dl", "dt", "em", "fieldset", "font", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "i", "img", "ins", "label", "legend", "li", "mark", "nav", "ol", "p", "pre", "q", "rt", "ruby", "s", "section", "small", "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "tt", "u", "ul"]
 ```
 
 #### API接口
