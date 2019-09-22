@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/astaxie/beego/httplib"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/astaxie/beego/httplib"
+	"github.com/russross/blackfriday"
 
 	"golang.org/x/net/html"
 
@@ -44,6 +46,14 @@ func New(customTags []string) *RichText {
 	return &RichText{
 		tagsMap: tagsMap,
 	}
+}
+
+func (r *RichText) ParseMarkdown(md string) (data []h2j, err error) {
+	return r.ParseMarkdownByByte([]byte(md))
+}
+
+func (r *RichText) ParseMarkdownByByte(mdByte []byte) (data []h2j, err error) {
+	return r.ParseByByte(blackfriday.MarkdownCommon(mdByte))
 }
 
 func (r *RichText) Parse(htmlStr string) (data []h2j, err error) {

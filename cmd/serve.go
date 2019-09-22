@@ -19,15 +19,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/TruthHun/html2json/html2json"
 	"github.com/gin-contrib/cors"
 	ginzip "github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 // serveCmd represents the serve command
@@ -82,7 +83,7 @@ func init() {
 type Response struct {
 	Error string      `json:"error,omitempty"`
 	IsOK  bool        `json:"is_ok"`
-	Data  interface{} `json:"data,omitempty"`
+	Nodes interface{} `json:"nodes,omitempty"`
 }
 
 var rt = html2json.NewDefault()
@@ -106,6 +107,7 @@ func serve(port int, tag ...string) {
 	app.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"pong": "hello html2json!"}) })
 	app.GET("/html2json", html2JSON)  // params: url, timeout
 	app.POST("/html2json", html2JSON) // params: html
+	app.POST("/md2json", md2json)     // params: markdown
 
 	fmt.Println("serve on port:", port)
 	err := app.Run(fmt.Sprintf(":%v", port))
@@ -123,7 +125,7 @@ func html2JSON(ctx *gin.Context) {
 		if htmlStr == "" {
 			err = errors.New("html is empty")
 		} else {
-			resp.Data, err = rt.Parse(htmlStr)
+			resp.Nodes, err = rt.Parse(htmlStr)
 		}
 	case http.MethodGet:
 		urlStr := ctx.DefaultQuery("url", "")
@@ -131,10 +133,26 @@ func html2JSON(ctx *gin.Context) {
 		if urlStr == "" {
 			err = errors.New("url is empty")
 		} else {
-			resp.Data, err = rt.ParseByURL(urlStr, timeout)
+			resp.Nodes, err = rt.ParseByURL(urlStr, timeout)
 		}
 	default:
 		err = errors.New("request method is not allow")
+	}
+	resp.IsOK = err == nil
+	if err != nil {
+		resp.Error = err.Error()
+	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+func md2json(ctx *gin.Context) {
+	var err error
+	resp := Response{IsOK: true}
+	md := ctx.DefaultPostForm("markdown", "")
+	if md == "" {
+		err = errors.New("markdown is empty")
+	} else {
+		resp.Nodes, err = rt.ParseMarkdown(md)
 	}
 	resp.IsOK = err == nil
 	if err != nil {

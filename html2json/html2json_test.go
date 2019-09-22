@@ -15,9 +15,20 @@ func toJSON(v interface{}) (js string) {
 	return string(b)
 }
 
+func TestRichText_ParseMarkdownByByte(t *testing.T) {
+	b, _ := ioutil.ReadFile("examples/bookstack-readme.md")
+	now := time.Now()
+	nodes, err := rt.ParseMarkdownByByte(b)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(time.Since(now))
+	t.Log(toJSON(nodes))
+}
+
 func TestParse_BigHTML(t *testing.T) {
 	b, _ := ioutil.ReadFile("examples/gin.html")
-	now:=time.Now()
+	now := time.Now()
 	nodes, err := rt.ParseByByte(b)
 	if err != nil {
 		t.Error(err)

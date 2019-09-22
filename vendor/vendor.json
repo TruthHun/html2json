@@ -123,6 +123,12 @@
 			"revisionTime": "2018-07-18T01:23:57Z"
 		},
 		{
+			"checksumSHA1": "4dSEe0Pl53PWpGOlpj6iIuPnPIY=",
+			"path": "github.com/russross/blackfriday",
+			"revision": "a925a152c144ea7de0f451eaf2f7db9e52fa005a",
+			"revisionTime": "2019-06-16T19:52:46Z"
+		},
+		{
 			"checksumSHA1": "uh6QVdBY0YCHyVfAgGidkmaQKA0=",
 			"path": "github.com/spf13/cobra",
 			"revision": "19cf35ea77e5981f8e8b90a897af621f2be864f6",
