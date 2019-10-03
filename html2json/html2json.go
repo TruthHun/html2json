@@ -55,7 +55,7 @@ func (r *RichText) ParseMarkdown(md, domain string) (data []h2j, err error) {
 }
 
 func (r *RichText) ParseMarkdownByByte(mdByte []byte, domain string) (data []h2j, err error) {
-	return r.ParseByByte(blackfriday.MarkdownCommon(mdByte), domain)
+	return r.ParseByByte(blackfriday.Run(mdByte), domain)
 }
 
 func (r *RichText) Parse(htmlStr string, domain string) (data []h2j, err error) {
