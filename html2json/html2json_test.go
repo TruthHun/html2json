@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
@@ -18,7 +19,7 @@ func toJSON(v interface{}) (js string) {
 func TestRichText_ParseMarkdownByByte(t *testing.T) {
 	b, _ := ioutil.ReadFile("examples/bookstack-readme.md")
 	now := time.Now()
-	nodes, err := rt.ParseMarkdownByByte(b)
+	nodes, err := rt.ParseMarkdownByByte(b, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -29,7 +30,7 @@ func TestRichText_ParseMarkdownByByte(t *testing.T) {
 func TestParse_BigHTML(t *testing.T) {
 	b, _ := ioutil.ReadFile("examples/gin.html")
 	now := time.Now()
-	nodes, err := rt.ParseByByte(b)
+	nodes, err := rt.ParseByByte(b, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -39,15 +40,16 @@ func TestParse_BigHTML(t *testing.T) {
 
 func TestParse_Media(t *testing.T) {
 	b, _ := ioutil.ReadFile("examples/media.html")
-	nodes, err := rt.ParseByByte(b)
+	nodes, err := rt.ParseByByteV2(b, "")
 	if err != nil {
 		t.Error(err)
 	}
 	t.Log(toJSON(nodes))
+	ioutil.WriteFile("examples/media.json", []byte(toJSON(nodes)), os.ModePerm)
 }
 
 func TestParseByURL(t *testing.T) {
-	nodes, err := rt.ParseByURL("https://my.oschina.net/huanghaibin/blog/3106432")
+	nodes, err := rt.ParseByURL("https://my.oschina.net/huanghaibin/blog/3106432", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -58,7 +60,7 @@ func BenchmarkParse(b *testing.B) {
 	h, _ := ioutil.ReadFile("examples/gin.html")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		rt.ParseByByte(h)
+		rt.ParseByByteV2(h, "")
 	}
 }
 
@@ -66,13 +68,13 @@ func BenchmarkParse_uniapp(b *testing.B) {
 	h, _ := ioutil.ReadFile("examples/uniapp.html")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		rt.ParseByByte(h)
+		rt.ParseByByte(h, "")
 	}
 }
 
 func BenchmarkParse2(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		rt.Parse("<div>hello world</div>")
+		rt.Parse("<div>hello world</div>", "")
 	}
 }

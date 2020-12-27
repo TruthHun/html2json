@@ -117,19 +117,25 @@ func (r *RichText) ParseByByteV2(htmlByte []byte, domain string) (inodes []inode
 			})
 		}
 	})
-	ret, _ := doc.Html()
+
+	ret, _ := doc.Find("body").Html()
 	slice := strings.Split(ret, splitMark)
 
 	var data []h2j
 	for _, item := range slice {
-		doc2, _ := goquery.NewDocumentFromReader(strings.NewReader(item))
-		data = append(data, r.parse(doc2.Find("body"), "")...)
+		if strings.TrimSpace(item) != "" {
+			doc2, _ := goquery.NewDocumentFromReader(strings.NewReader(item))
+			data = append(data, r.parseV2(doc2.Find("body"), domain)...)
+		}
 	}
 
 	var idata []h2j
 	for _, item := range data {
 		if _, ok := mediaTags[item.Name]; ok {
-			inodes = append(inodes, inode{"richtext", idata}, inode{item.Name, []h2j{item}})
+			if len(idata) > 0 {
+				inodes = append(inodes, inode{"richtext", idata})
+			}
+			inodes = append(inodes, inode{item.Name, []h2j{item}})
 			idata = make([]h2j, 0)
 		} else {
 			idata = append(idata, item)
@@ -222,11 +228,7 @@ func (r *RichText) parseV2(sel *goquery.Selection, domain string) (data []h2j) {
 					case "audio", "video", "iframe":
 						if src, ok := attr["src"]; ok {
 							src = r.fixSourceLink(domain, src)
-							attr["href"] = src
-							delete(attr, "src")
-							h.Children = []h2j{{Type: "text", Text: fmt.Sprintf(" [%v] %v ", h.Name, src)}}
 						}
-						h.Name = "a"
 					default:
 						h.Name = "div"
 					}
