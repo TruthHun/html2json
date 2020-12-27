@@ -30,8 +30,8 @@ type h2j struct {
 }
 
 type inode struct {
-	Type string
-	Data []h2j
+	Type string `json:"type"`
+	Data []h2j  `json:"data"`
 }
 
 type RichText struct {
