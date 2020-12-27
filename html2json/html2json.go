@@ -29,6 +29,11 @@ type h2j struct {
 	Children []h2j             `json:"children,omitempty"`
 }
 
+type inode struct {
+	Type string
+	Data []h2j
+}
+
 type RichText struct {
 	tagsMap sync.Map
 }
@@ -82,6 +87,58 @@ func (r *RichText) ParseByByte(htmlByte []byte, domain string) (data []h2j, err 
 	return
 }
 
+func (r *RichText) ParseByByteV2(htmlByte []byte, domain string) (inodes []inode, err error) {
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(bytes.NewReader(htmlByte))
+	if err != nil {
+		return
+	}
+
+	splitMark := "$@$@$@$"
+	mediaTags := map[string]bool{"audio": true, "video": true, "iframe": true, "img": true}
+	blockTags := map[string]bool{"article": true, "aside": true, "base": true, "body": true, "center": true, "figure": true, "nav": true, "title": true, "h1": true, "h2": true, "h3": true, "h4": true, "h5": true, "h6": true, "p": true, "div": true}
+	doc.Find("body").Each(func(i int, selection *goquery.Selection) {
+		for tag, _ := range mediaTags {
+			doc.Find(tag).Each(func(idx int, sel *goquery.Selection) {
+				if tag != "img" {
+					sel.BeforeHtml(splitMark)
+					sel.AfterHtml(splitMark)
+				} else {
+					tagName := "body"
+					if len(sel.Parent().Nodes) > 0 {
+						tagName = strings.ToLower(sel.Parent().Nodes[0].DataAtom.String())
+					}
+					// 父节点为块节点且除了图片之外没有其他内容
+					if _, ok := blockTags[tagName]; ok && strings.TrimSpace(sel.Parent().Text()) == "" {
+						sel.BeforeHtml(splitMark)
+						sel.AfterHtml(splitMark)
+					}
+				}
+			})
+		}
+	})
+	ret, _ := doc.Html()
+	slice := strings.Split(ret, splitMark)
+
+	var data []h2j
+	for _, item := range slice {
+		doc2, _ := goquery.NewDocumentFromReader(strings.NewReader(item))
+		data = append(data, r.parse(doc2.Find("body"), "")...)
+	}
+
+	var idata []h2j
+	for _, item := range data {
+		if _, ok := mediaTags[item.Name]; ok {
+			inodes = append(inodes, inode{"richtext", idata}, inode{item.Name, []h2j{item}})
+			idata = make([]h2j, 0)
+		} else {
+			idata = append(idata, item)
+		}
+	}
+
+	return
+}
+
 func (r *RichText) ParseByURL(urlStr string, domain string, timeout ...int) (data []h2j, err error) {
 	var (
 		resp *http.Response
@@ -106,6 +163,87 @@ func (r *RichText) ParseByURL(urlStr string, domain string, timeout ...int) (dat
 		return
 	}
 	return r.ParseByByte(b, domain)
+}
+
+func (r *RichText) parseV2(sel *goquery.Selection, domain string) (data []h2j) {
+	nodes := sel.Children().Nodes
+	if len(nodes) == 0 {
+		if txt := sel.Text(); txt != "" {
+			data = []h2j{{Text: txt, Type: "text"}}
+		}
+		return
+	}
+	sel.Contents().FilterFunction(func(i int, s *goquery.Selection) bool {
+		ns := s.Nodes
+		for _, item := range ns {
+			var h h2j
+			if item.Type != html.TextNode {
+				h.Name = strings.ToLower(item.Data)
+
+				// 忽略script
+				if h.Name == "script" || h.Name == "link" {
+					continue
+				}
+
+				// attrs
+				attr := make(map[string]string)
+				for _, a := range item.Attr {
+					attr[a.Key] = a.Val
+				}
+
+				if class, ok := attr["class"]; ok {
+					attr["class"] = fmt.Sprintf("tag-%v %v", h.Name, class)
+				} else {
+					attr["class"] = "tag-" + h.Name
+				}
+
+				switch h.Name {
+				case "img", "audio", "video", "iframe":
+					if src, ok := attr["src"]; ok {
+						attr["src"] = r.fixSourceLink(domain, src)
+					}
+				case "a":
+					if href, ok := attr["href"]; ok {
+						attr["href"] = r.fixSourceLink(domain, href)
+					}
+				}
+
+				// 小程序不支持的HTML标签，全部转为div标签
+				if _, ok := r.tagsMap.Load(h.Name); !ok {
+					switch h.Name {
+					case "pre":
+						h.Name = "div"
+						defaultStyle := "display: block;font-family: monospace;white-space: pre;margin: 1em 0;" // set default <pre> css
+						if style, ok := attr["style"]; ok {
+							attr["style"] = defaultStyle + style
+						} else {
+							attr["style"] = defaultStyle
+						}
+					case "audio", "video", "iframe":
+						if src, ok := attr["src"]; ok {
+							src = r.fixSourceLink(domain, src)
+							attr["href"] = src
+							delete(attr, "src")
+							h.Children = []h2j{{Type: "text", Text: fmt.Sprintf(" [%v] %v ", h.Name, src)}}
+						}
+						h.Name = "a"
+					default:
+						h.Name = "div"
+					}
+				}
+				h.Attrs = attr
+				if len(h.Children) == 0 {
+					h.Children = r.parseV2(goquery.NewDocumentFromNode(item).Selection, domain)
+				}
+			} else {
+				h.Type = "text"
+				h.Text = goquery.NewDocumentFromNode(item).Selection.Text()
+			}
+			data = append(data, h)
+		}
+		return true
+	})
+	return
 }
 
 func (r *RichText) parse(sel *goquery.Selection, domain string) (data []h2j) {
