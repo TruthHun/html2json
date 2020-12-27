@@ -334,6 +334,8 @@ func (r *RichText) fixSourceLink(domain, link string) string {
 		return link
 	}
 
+	link = strings.ReplaceAll(link, "\\", "/")
+
 	if strings.HasPrefix(link, "//") {
 		return "http:" + link
 	}
