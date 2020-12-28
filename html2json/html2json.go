@@ -129,8 +129,12 @@ func (r *RichText) ParseByByteV2(htmlByte []byte, domain string) (inodes []inode
 		}
 	}
 
-	var idata []h2j
-	for _, item := range data {
+	var (
+		idata []h2j
+		l     = len(data)
+	)
+
+	for idx, item := range data {
 		if _, ok := mediaTags[item.Name]; ok {
 			if len(idata) > 0 {
 				inodes = append(inodes, inode{"richtext", idata})
@@ -139,6 +143,9 @@ func (r *RichText) ParseByByteV2(htmlByte []byte, domain string) (inodes []inode
 			idata = make([]h2j, 0)
 		} else {
 			idata = append(idata, item)
+			if idx == l-1 {
+				inodes = append(inodes, inode{"richtext", idata})
+			}
 		}
 	}
 
