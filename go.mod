@@ -9,7 +9,7 @@ require (
 	github.com/astaxie/beego v1.12.0
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/gzip v0.0.1
-	github.com/gin-gonic/gin v1.4.0
+	github.com/gin-gonic/gin v1.7.0
 	github.com/russross/blackfriday v2.0.0+incompatible
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/cobra v0.0.5
