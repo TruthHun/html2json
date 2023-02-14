@@ -6,7 +6,7 @@ replace github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 => github.
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.0
-	github.com/astaxie/beego v1.12.0
+	github.com/astaxie/beego v1.12.2
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/gzip v0.0.1
 	github.com/gin-gonic/gin v1.4.0
